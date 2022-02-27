@@ -6,21 +6,6 @@ on:
     branches: [ main ]
 
 jobs:
-  build-project-code:
-    name: Build project code
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          extensions: curl, dom, simplexml, soap, bcmath, mbstring, zip
-
-      - uses: ramsey/composer-install@v1
-        with:
-          composer-options: "--prefer-dist --optimize-autoloader --ignore-platform-reqs"
   deploy:
     name: deploy
     runs-on: ubuntu-latest
@@ -36,6 +21,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+      - uses: "ramsey/composer-install@v1"
+        with:
+          composer-options: "--prefer-dist --optimize-autoloader --no-dev"
+      - run: composer require bref/bref
       - name: serverless deploy
         uses: serverless/github-action@v3
         with:
