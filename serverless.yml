@@ -1,0 +1,55 @@
+service: mm-api
+
+provider:
+    name: aws
+    # The AWS region in which to deploy (us-east-1 is the default)
+    region: eu-west-2
+    # The stage of the application, e.g. dev, production, staging… ('dev' is the default)
+    stage: production
+    runtime: provided.al2
+    lambdaHashingVersion: 20201221
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - "ses:SendEmail"
+          - "ses:SendRawEmail"
+        Resource: "*"
+    environment:
+      APP_DEBUG: false
+      APP_KEY: ${{ secrets.APP_KEY }}
+      APP_NAME: "MM API"
+      APP_ENV: "production"
+      APP_URL: ""
+      MAIL_MAILER: "ses"
+
+package:
+    # Directories to exclude from deployment
+    patterns:
+        - '!node_modules/**'
+        - '!public/storage'
+        - '!resources/assets/**'
+        - '!storage/**'
+        - '!tests/**'
+    exclude:
+        - .env
+
+functions:
+    # This function runs the Laravel website/API
+    web:
+        handler: public/index.php
+        timeout: 25 # in seconds (API Gateway has a timeout of 29 seconds)
+        layers:
+            - ${bref:layer.php-81-fpm}
+        events:
+            - httpApi: '*'
+    # This function lets us run artisan commands in Lambda
+    artisan:
+        handler: artisan
+        timeout: 120 # in seconds
+        layers:
+            - ${bref:layer.php-81} # PHP
+            - ${bref:layer.console} # The "console" layer
+
+plugins:
+    # We need to include the Bref plugin
+    - ./vendor/bref/bref
