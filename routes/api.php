@@ -14,5 +14,4 @@ use App\Http\Controllers\ContactController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 Route::post('/contact', [ContactController::class, 'send']);

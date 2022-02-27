@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 class ContactController extends Controller
 {
     public function send(Request $request){
+
         $request->validate([
            'name' => '',
            'email' => 'required|email:rfc,dns',
@@ -21,8 +22,6 @@ class ContactController extends Controller
 
         Mail::to('matthew@mincher.org')->send(new ContactMessage($name, $email, $message));
 
-        return response()->json([
-            'success' => true
-        ]);
+        return response()->noContent();
     }
 }
