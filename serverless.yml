@@ -16,7 +16,7 @@ provider:
         Resource: "*"
     environment:
       APP_DEBUG: false
-      APP_KEY: ${{ secrets.APP_KEY }}
+      APP_KEY: ${env:APP_KEY}
       APP_NAME: "MM API"
       APP_ENV: "production"
       APP_URL: ""
