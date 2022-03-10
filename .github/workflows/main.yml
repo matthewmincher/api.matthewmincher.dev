@@ -5,6 +5,9 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  id-token: write
+  contents: read
 jobs:
   deploy:
     name: deploy
@@ -26,11 +29,14 @@ jobs:
         with:
           composer-options: "--prefer-dist --optimize-autoloader --no-dev"
       - run: composer require bref/bref
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-west-2
       - name: serverless deploy
         uses: serverless/github-action@v3
         with:
           args: deploy
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           APP_KEY: ${{ secrets.APP_KEY }}
